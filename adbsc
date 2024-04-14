@@ -1,22 +1,25 @@
 #!/bin/env bash
+## Settings
 port='5555'
 scrs=false
 comm=''
 while getopts 'shc:p:' flag; do
   case "${flag}" in
-    h) echo -e "\033[1m-s\033[0m" for use Scrcpy && echo -e "\033[1m-p\033[0m" for set custom tcpip port && exit 1;;
+    h) echo -e "\033[1m-s\033[0m" for use Scrcpy && echo -e "\033[1m-p\033[0m" for set custom tcpip port && echo -e "\033[1m-c\033[0m" for use to execute the custom command on your phone && exit 1;;
     s) scrs=true ;;
     p) port="$OPTARG";;
     c) comm="$OPTARG";;
   esac
 done
+## Preparation
 adb kill-server # убиваем серевер ADB
-unreg=$(adb devices | grep unauthorized)
+## Cheking device's rules 
+unreg=$(adb devices | grep unauthorized) 
 if [[ "$unreg" != "" ]];then
 adb shell
-notify-send "adb_sc" "Confirm the dialog on your phone & restart adb_sc"
+notify-send "adb_sc" "Confirm the dialog on your phone & restart adb_sc" 
 else
-
+## main
 adb tcpip $port && sleep 3 # изменяем порт ADB
 ipadr=$(adb shell ip -o a | grep "wlan0" | head -n1 | awk '{print $4}' | awk '{ print substr($1, 1, length($1)-3) '}) # получаем IP
 if [[ $ipadr == "" ]]; then # проверяем на ошибку получения IP
